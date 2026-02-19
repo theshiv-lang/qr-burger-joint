@@ -78,8 +78,8 @@
         function placeOrder() {
             if (cart.length === 0) return;
 
-            const orderData = {
-                table_id: parseInt(tableNum), 
+           const orderData = {
+                table_id: 1, // FIX: Using the actual Database ID!
                 item_ids: cart
             };
 
