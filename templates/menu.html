@@ -74,28 +74,40 @@
             document.getElementById('cart-count').innerText = cart.length;
         }
 
-        // 3. Send Order to Python
+       // 3. Send Order to Python
         function placeOrder() {
             if (cart.length === 0) return;
 
             const orderData = {
-                table_id: parseInt(tableNum), // Assuming Table Number = Table ID for now
+                table_id: parseInt(tableNum), 
                 item_ids: cart
             };
 
-            fetch('/orders/', {
+            // FIX 1: Removed the trailing slash after /orders
+            fetch('/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData)
             })
-            .then(response => response.json())
+            .then(async response => {
+                // FIX 2: Actually check if Python rejected the order!
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(errText); // Force it to the catch block
+                }
+                return response.json();
+            })
             .then(data => {
-                alert("✅ Order Sent to Kitchen! Order ID: " + data.order_id);
+                alert("✅ Order Sent to Kitchen!");
                 cart = []; // Clear cart
                 document.getElementById('cart-bar').style.display = 'none';
                 window.location.reload();
             })
-            .catch(err => alert("Error sending order"));
+            .catch(err => {
+                // Now we will actually see why it's failing!
+                alert("❌ Backend Error: " + err.message);
+                console.error(err);
+            });
         }
     </script>
 </body>
