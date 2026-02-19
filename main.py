@@ -189,3 +189,40 @@ def complete_order(order_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"message": "Order completed!"}
+
+# --- PASTE AT THE VERY BOTTOM OF main.py ---
+
+@app.get("/setup")
+def setup_database(db: Session = Depends(get_db)):
+    # 1. Create the Restaurant
+    rest = db.query(models.Restaurant).filter(models.Restaurant.id == 1).first()
+    if not rest:
+        rest = models.Restaurant(name="Shivam's Burger Joint", email="admin@test.com")
+        db.add(rest)
+        db.commit()
+        
+    # 2. Create Table 5
+    table = db.query(models.Table).filter(models.Table.table_number == 5).first()
+    if not table:
+        table = models.Table(table_number=5, restaurant_id=1)
+        db.add(table)
+        db.commit()
+        
+    # 3. Cook up the Menu
+    new_items = [
+        {"name": "Paneer Tikka Wrap", "price": 180, "desc": "Grilled paneer wrapped in a whole wheat roti.", "veg": True},
+        {"name": "Classic French Fries", "price": 120, "desc": "Crispy golden fries with sea salt.", "veg": True},
+        {"name": "Veg Margherita Pizza", "price": 299, "desc": "Wood-fired crust with fresh basil and mozzarella.", "veg": True},
+        {"name": "Cold Coffee", "price": 150, "desc": "Thick, creamy blended cold coffee.", "veg": True},
+        {"name": "Spicy Veggie Burger", "price": 200, "desc": "Crispy vegetable patty with spicy mayo.", "veg": True}
+    ]
+    
+    for item in new_items:
+        exists = db.query(models.MenuItem).filter(models.MenuItem.name == item["name"]).first()
+        if not exists:
+            db_item = models.MenuItem(name=item["name"], price=item["price"], description=item["desc"], is_vegetarian=item["veg"], restaurant_id=1)
+            db.add(db_item)
+            
+    db.commit()
+    
+    return {"message": "✅ Magic Setup Complete! Restaurant, Table 5, and Menu are ready."}
