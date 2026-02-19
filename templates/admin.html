@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Dashboard</title>
+    <meta http-equiv="refresh" content="5"> 
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background-color: #222; color: white; padding: 20px; }
+        .header { border-bottom: 2px solid #555; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;}
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        
+        /* Ticket Styling */
+        .ticket { background-color: #fff; color: black; padding: 15px; border-radius: 5px; border-top: 5px solid #ffc107; box-shadow: 0 4px 8px rgba(0,0,0,0.3);}
+        .ticket-header { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-size: 18px;}
+        .ticket-items ul { padding-left: 20px; margin: 0; font-size: 18px; font-weight: bold;}
+        .ticket-items li { margin-bottom: 8px; }
+        .status { background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 14px; }
+        
+        .btn-done { width: 100%; margin-top: 15px; padding: 12px; background: #28a745; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-done:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>👨‍🍳 Kitchen Display System</h1>
+        <h3>Live Orders</h3>
+    </div>
+
+    <div id="orders-grid" class="grid">
+        <p>Loading tickets...</p>
+    </div>
+
+    <script>
+        fetch('/restaurants/1/orders')
+            .then(response => response.json())
+            .then(orders => {
+                const container = document.getElementById('orders-grid');
+                container.innerHTML = ''; 
+
+                // Only show orders that are still pending
+                const pendingOrders = orders.filter(o => o.status === "PENDING");
+
+                if (pendingOrders.length === 0) {
+                    container.innerHTML = '<p>No active orders. Kitchen is clear!</p>';
+                    return;
+                }
+
+                pendingOrders.forEach(order => {
+                    let itemsHtml = '';
+                    
+                    // The items are now formatted by Python as "3x Burger"
+                    order.items.forEach(item => {
+                        itemsHtml += `<li>${item}</li>`;
+                    });
+
+                    const html = `
+                        <div class="ticket">
+                            <div class="ticket-header">
+                                <span>Table ${order.table}</span>
+                                <span class="status">#${order.id}</span>
+                            </div>
+                            <div class="ticket-items">
+                                <ul>${itemsHtml}</ul>
+                            </div>
+                            <button class="btn-done" onclick="markComplete(${order.id})">✅ Mark as Done</button>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+            });
+
+        function markComplete(orderId) {
+            fetch(`/orders/${orderId}/complete`, { method: 'POST' })
+                .then(() => window.location.reload());
+        }
+    </script>
+</body>
+</html>
