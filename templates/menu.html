@@ -79,7 +79,7 @@
             if (cart.length === 0) return;
 
            const orderData = {
-                table_id: 1, // FIX: Using the actual Database ID!
+                table_id: parseInt(tableNum), // Now it grabs the exact table you scanned!
                 item_ids: cart
             };
 
