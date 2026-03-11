@@ -201,12 +201,13 @@ def setup_database(db: Session = Depends(get_db)):
         db.add(rest)
         db.commit()
         
-    # 2. Create Table 5
-    table = db.query(models.Table).filter(models.Table.table_number == 5).first()
-    if not table:
-        table = models.Table(table_number=5, restaurant_id=1)
-        db.add(table)
-        db.commit()
+  # 2. Create Tables 1 through 5
+    for i in range(1, 6):
+        table = db.query(models.Table).filter(models.Table.table_number == i, models.Table.restaurant_id == 1).first()
+        if not table:
+            table = models.Table(table_number=i, restaurant_id=1)
+            db.add(table)
+    db.commit()
         
     # 3. Cook up the Menu
     new_items = [
@@ -225,4 +226,5 @@ def setup_database(db: Session = Depends(get_db)):
             
     db.commit()
     
+
     return {"message": "✅ Magic Setup Complete! Restaurant, Table 5, and Menu are ready."}
