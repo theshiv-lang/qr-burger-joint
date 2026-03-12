@@ -209,13 +209,19 @@ def setup_database(db: Session = Depends(get_db)):
             db.add(table)
     db.commit()
         
-    # 3. Cook up the Menu
+
+  # 3. Cook up the Expanded Menu
     new_items = [
         {"name": "Paneer Tikka Wrap", "price": 180, "desc": "Grilled paneer wrapped in a whole wheat roti.", "veg": True},
         {"name": "Classic French Fries", "price": 120, "desc": "Crispy golden fries with sea salt.", "veg": True},
         {"name": "Veg Margherita Pizza", "price": 299, "desc": "Wood-fired crust with fresh basil and mozzarella.", "veg": True},
         {"name": "Cold Coffee", "price": 150, "desc": "Thick, creamy blended cold coffee.", "veg": True},
-        {"name": "Spicy Veggie Burger", "price": 200, "desc": "Crispy vegetable patty with spicy mayo.", "veg": True}
+        {"name": "Spicy Veggie Burger", "price": 200, "desc": "Crispy vegetable patty with spicy mayo.", "veg": True},
+        # --- NEW ITEMS ---
+        {"name": "Veg Hakka Noodles", "price": 190, "desc": "Wok-tossed noodles with crunchy vegetables.", "veg": True},
+        {"name": "Chilli Paneer Dry", "price": 220, "desc": "Spicy and tangy paneer cubes tossed with bell peppers.", "veg": True},
+        {"name": "Oreo Thick Shake", "price": 160, "desc": "Rich chocolate milkshake blended with Oreo cookies.", "veg": True},
+        {"name": "Sizzling Brownie", "price": 180, "desc": "Warm chocolate brownie topped with vanilla ice cream.", "veg": True}
     ]
     
     for item in new_items:
@@ -228,3 +234,4 @@ def setup_database(db: Session = Depends(get_db)):
     
 
     return {"message": "✅ Magic Setup Complete! Restaurant, Table 5, and Menu are ready."}
+
