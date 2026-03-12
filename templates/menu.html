@@ -30,7 +30,7 @@
         </div>
 
     <div class="bottom-bar" id="cart-bar" style="display: none;">
-        <button class="order-btn" onclick="placeOrder()">Place Order (<span id="cart-count">0</span> items)</button>
+        <button class="order-btn" onclick="placeOrder()">Place Order (<span id="cart-count">0</span>) - &#8377;<span id="cart-total">0</span></button>
     </div>
 
     <script>
@@ -60,7 +60,7 @@
                                 <p>${item.description}</p>
                                 <div class="price">&#8377;${item.price}</div>
                             </div>
-                            <button class="btn" onclick="addToCart(${item.id})">Add +</button>
+                           <button class="btn" onclick="addToCart(${item.id}, ${item.price})">Add +</button>
                         </div>
                     `;
                     container.innerHTML += html;
@@ -68,12 +68,16 @@
             });
 
         // 2. Add to Cart Logic
-        function addToCart(itemId) {
+    // 2. Add to Cart Logic with Calculator
+        function addToCart(itemId, itemPrice) {
             cart.push(itemId);
+            cartTotal += itemPrice; // Add the price to our running total
             document.getElementById('cart-bar').style.display = 'flex';
             document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-total').innerText = cartTotal; // Update UI
         }
-
+        
+        // ... (Leave the fetch('/api/menu/...') part exactly as it is) ...
        // 3. Send Order to Python
         function placeOrder() {
             if (cart.length === 0) return;
