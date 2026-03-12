@@ -33,13 +33,13 @@
         <button class="order-btn" onclick="placeOrder()">Place Order (<span id="cart-count">0</span>) - &#8377;<span id="cart-total">0</span></button>
     </div>
 
-    <script>
-        let cart = []; // Stores the IDs of selected food
+   <script>
+        // --- GLOBAL VARIABLES ---
+        let cart = []; 
+        let cartTotal = 0; // <-- The missing puzzle piece!
         const pathParts = window.location.pathname.split('/');
         const restId = pathParts[2];
         const tableNum = pathParts[3];
-        // Note: In a real app, we'd fetch the real Table ID from the backend, 
-        // but for this demo, we'll assume table_number matches the ID 1-to-1.
         
         // 1. Fetch Menu
         fetch(`/api/menu/${restId}/${tableNum}`)
@@ -50,7 +50,6 @@
                 const container = document.getElementById('menu-container');
                 
                 data.menu.forEach(item => {
-                    // Filter out bad data (like that "string" item)
                     if (item.price === 0) return; 
 
                     const html = `
@@ -60,55 +59,51 @@
                                 <p>${item.description}</p>
                                 <div class="price">&#8377;${item.price}</div>
                             </div>
-                           <button class="btn" onclick="addToCart(${item.id}, ${item.price})">Add +</button>
+                            <button class="btn" onclick="addToCart(${item.id}, ${item.price})">Add +</button>
                         </div>
                     `;
                     container.innerHTML += html;
                 });
             });
 
-        // 2. Add to Cart Logic
-    // 2. Add to Cart Logic with Calculator
+        // 2. Add to Cart Logic with Calculator
         function addToCart(itemId, itemPrice) {
             cart.push(itemId);
-            cartTotal += itemPrice; // Add the price to our running total
+            cartTotal += itemPrice; // Math happens here!
             document.getElementById('cart-bar').style.display = 'flex';
             document.getElementById('cart-count').innerText = cart.length;
-            document.getElementById('cart-total').innerText = cartTotal; // Update UI
+            document.getElementById('cart-total').innerText = cartTotal;
         }
-        
-        // ... (Leave the fetch('/api/menu/...') part exactly as it is) ...
-       // 3. Send Order to Python
+
+        // 3. Send Order to Python
         function placeOrder() {
             if (cart.length === 0) return;
 
-           const orderData = {
-                table_id: parseInt(tableNum), // Now it grabs the exact table you scanned!
+            const orderData = {
+                table_id: parseInt(tableNum),
                 item_ids: cart
             };
 
-            // FIX 1: Removed the trailing slash after /orders
             fetch('/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData)
             })
             .then(async response => {
-                // FIX 2: Actually check if Python rejected the order!
                 if (!response.ok) {
                     const errText = await response.text();
-                    throw new Error(errText); // Force it to the catch block
+                    throw new Error(errText); 
                 }
                 return response.json();
             })
             .then(data => {
                 alert("✅ Order Sent to Kitchen!");
-                cart = []; // Clear cart
+                cart = []; 
+                cartTotal = 0; // Reset total for the next order
                 document.getElementById('cart-bar').style.display = 'none';
                 window.location.reload();
             })
             .catch(err => {
-                // Now we will actually see why it's failing!
                 alert("❌ Backend Error: " + err.message);
                 console.error(err);
             });
