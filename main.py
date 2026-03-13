@@ -195,11 +195,13 @@ def complete_order(order_id: int, db: Session = Depends(get_db)):
 @app.get("/setup")
 def setup_database(db: Session = Depends(get_db)):
     # 1. Create the Restaurant
-    rest = db.query(models.Restaurant).filter(models.Restaurant.id == 1).first()
-    if not rest:
-        rest = models.Restaurant(name="Ninja's Food Joint", email="admin@test.com")
-        db.add(rest)
+   # 1. Create Restaurant
+    restaurant = db.query(models.Restaurant).filter(models.Restaurant.id == 1).first()
+    if not restaurant:
+        restaurant = models.Restaurant(name="Ninja's Food Joint") # 🥷 REBRAND HERE!
+        db.add(restaurant)
         db.commit()
+        db.refresh(restaurant)
         
   # 2. Create Tables 1 through 5
     for i in range(1, 6):
@@ -234,5 +236,6 @@ def setup_database(db: Session = Depends(get_db)):
     
 
     return {"message": "✅ Magic Setup Complete! Restaurant, Table 5, and Menu are ready."}
+
 
 
