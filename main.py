@@ -197,7 +197,7 @@ def setup_database(db: Session = Depends(get_db)):
     # 1. Create the Restaurant
     rest = db.query(models.Restaurant).filter(models.Restaurant.id == 1).first()
     if not rest:
-        rest = models.Restaurant(name="Shivam's Burger Joint", email="admin@test.com")
+        rest = models.Restaurant(name="Ninja's Food Joint", email="admin@test.com")
         db.add(rest)
         db.commit()
         
@@ -234,4 +234,5 @@ def setup_database(db: Session = Depends(get_db)):
     
 
     return {"message": "✅ Magic Setup Complete! Restaurant, Table 5, and Menu are ready."}
+
 
